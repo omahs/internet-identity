@@ -1,0 +1,18 @@
+name: Test
+
+on:
+  push:
+
+jobs:
+  update-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+        # First, check rust GitHub releases for a new version. We assume that the
+        # latest version's tag name is the version.
+      - name: Check new rust version
+        id: update
+        run: |
+          curl --silent -H 'Accept: application/vnd.github.v3+json' https://api.github.com/repos/rust-lang/rust/releases/latest
+          curl --silent -H 'Accept: application/vnd.github.v3+json' https://api.github.com/repos/rust-lang/rust/releases/latest | jq -cMr .tag_name
