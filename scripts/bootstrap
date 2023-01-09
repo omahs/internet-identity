@@ -59,8 +59,13 @@ then
     run mkdir -p "$bin_dir"
 
     echo "Downloading ic-cdk-optimizer"
+    wildcards=( )
+    if tar --version | grep GNU 
+    then
+        wildcards+=( "--wildcards" )
+    fi
     run curl --silent --location "$optimizer_url" \
-        | tar xzf - -C "$bin_dir" --strip-components=1 '*/ic-cdk-optimizer'
+        | tar xzf - -C "$bin_dir" --strip-components=1 "${wildcards[@]}" '*/ic-cdk-optimizer'
 
     if [[ ! ":$PATH:" == *":$bin_dir:"* ]]; then
       echo "PATH is missing '$bin_dir', please add '$bin_dir' to PATH"
