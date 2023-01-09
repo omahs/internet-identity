@@ -177,7 +177,7 @@ jobs:
             ~/.cargo/git
             demos/test-app/target
           key: ${{ runner.os }}-cargo-${{ hashFiles('demos/test-app/Cargo.lock', 'rust-toolchain.toml') }}
-      - uses: ./.github/actions/bootstrap
+      - run: ./scripts/bootstrap
       - uses: ./.github/actions/setup-node
       - name: "Build test app canister"
         working-directory: demos/test-app
@@ -238,7 +238,7 @@ jobs:
           echo "commit_now=$commit_now" >> $GITHUB_OUTPUT
           echo "now: $commit_now"
 
-      - uses: ./.github/actions/bootstrap
+      - run: ./scripts/bootstrap
 
       # Rustup only installs cargo on the first call, so we use a dedicated step to get a good idea of how
       # time is spent in each step separately

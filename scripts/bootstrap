@@ -16,15 +16,53 @@ function run() {
     fi
 }
 
-rust_version=$(cat ./rust-toolchain.toml | sed -n 's/^channel[[:space:]]*=[[:space:]]"\(.*\)"/\1/p')
-echo "using rust version '$rust_version'"
+# Ask user for confirmation on "$1" before going further
+# (skipped on CI)
+function confirm() {
+    if [[ -n ${CI:-} ]]; then return; fi
+    read -p "$1 [y/n]" -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]
+    then
+        exit 1
+    fi
+}
 
+rust_version=$(cat ./rust-toolchain.toml | sed -n 's/^channel[[:space:]]*=[[:space:]]"\(.*\)"/\1/p')
+confirm "Install rust up for rust version '$rust_version'?"
+
+echo "Installing rust '$rust_version'"
 # here we set the toolchain to 'none' and rustup will pick up on ./rust-toolchain.toml
 run curl --fail https://sh.rustup.rs -sSf | run sh -s -- -y --default-toolchain "none" --no-modify-path
 
 echo "looking for ic-cdk-optimizer 0.3.4"
 if [[ ! "$(command -v ic-cdk-optimizer)" || "$(ic-cdk-optimizer --version)" != "ic-cdk-optimizer 0.3.4" ]]
 then
-    echo "installing ic-cdk-optimizer 0.3.4"
-    run cargo install ic-cdk-optimizer --version 0.3.4
+    bin_dir="$HOME/.local/bin"
+    confirm "Install ic-cdk-optimizer in '$bin_dir'?"
+
+    uname_sys=$(uname -s)
+    case "$uname_sys" in
+        Darwin)
+            optimizer_url="https://github.com/dfinity/cdk-rs/releases/download/0.3.5/ic-cdk-optimizer-0.3.5-x86_64-apple-darwin.tar.gz"
+            ;;
+        Linux)
+            optimizer_url="https://github.com/dfinity/cdk-rs/releases/download/0.3.5/ic-cdk-optimizer-0.3.5-x86_64-unknown-linux-gnu.tar.gz"
+            ;;
+        *)
+            echo uknown system "$uname_sys, please install ic-cdk-optimizer manually"
+            ;;
+    esac
+
+    echo "Installing optimizer release to '$bin_dir': '$optimizer_url'"
+    echo "Creating '$bin_dir' if it doesn't exist"
+    run mkdir -p "$bin_dir"
+
+    echo "Downloading ic-cdk-optimizer"
+    run curl --silent --location "$optimizer_url" \
+        | tar xzf - -C "$bin_dir" --strip-components=1 '*/ic-cdk-optimizer'
+
+    if [[ ! ":$PATH:" == *":$bin_dir:"* ]]; then
+      echo "PATH is missing '$bin_dir', please add '$bin_dir' to PATH"
+    fi
 fi

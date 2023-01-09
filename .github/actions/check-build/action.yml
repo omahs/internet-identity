@@ -7,7 +7,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: ./.github/actions/bootstrap
+    - run: ./scripts/bootstrap
 
     # run the build
     - run: npm ci
