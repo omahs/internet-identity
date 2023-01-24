@@ -213,7 +213,7 @@ pub fn register(
             archive_operation(
                 anchor_number,
                 device_principal, // pretend it's the device itself. TODO: Should we keep track of whether
-                                  // this was a temp key?
+                // this was a temp key?
                 Operation::RegisterAnchor {
                     device: DeviceDataWithoutAlias::from(device),
                 },

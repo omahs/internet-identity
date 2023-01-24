@@ -74,7 +74,6 @@ pub struct PersistentState {
     pub canister_creation_cycles_cost: u64,
 }
 
-
 // A map of "temporary keys" attached to devices. A temporary key can be used in lieu
 // of the device but has a short expiration time. These keys are used as a workaround for WebAuthn
 // needing two users interactions: one for "create" and one for "sign". So instead we only "create"
