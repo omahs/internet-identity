@@ -143,6 +143,8 @@ pub fn remove(anchor_number: AnchorNumber, device_key: DeviceKey) {
     // must be called before the first await because it requires caller()
     trap_if_not_authenticated(&anchor);
 
+    state::with_temp_keys_mut(|temp_keys| temp_keys.remove(&device_key));
+
     anchor.remove_device(&device_key).unwrap_or_else(|err| {
         trap(&format!(
             "failed to remove device of anchor {}: {}",

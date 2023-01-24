@@ -155,20 +155,40 @@ fn check_challenge(res: ChallengeAttempt) -> Result<(), ()> {
     })
 }
 
-pub fn register(device_data: DeviceData, challenge_result: ChallengeAttempt) -> RegisterResponse {
+pub fn register(
+    device_data: DeviceData,
+    challenge_result: ChallengeAttempt,
+    // A temporary key than can be used in lieu of 'device_data' for a brief period of time
+    // The key is optional for backwards compatibility
+    temp_key: Option<Principal>,
+) -> RegisterResponse {
     delegation::prune_expired_signatures();
     if let Err(()) = check_challenge(challenge_result) {
         return RegisterResponse::BadChallenge;
     }
 
     let device = Device::from(device_data);
+    let device_principal = Principal::self_authenticating(&device.pubkey);
 
-    if caller() != Principal::self_authenticating(&device.pubkey) {
-        trap(&format!(
-            "{} could not be authenticated against {:?}",
-            caller(),
-            device.pubkey
-        ));
+    // Perform a sanity check. If the caller is neither the device nor the temporary key, then we
+    // could technically allow this to go through but it's most likely a mistake.
+    if caller() != device_principal {
+        if let Some(temp_key) = temp_key {
+            if caller() != temp_key {
+                trap(&format!(
+                    "caller {} could not be authenticated against device pubkey {} or temporary key {}",
+                        caller(),
+                        device_principal,
+                        temp_key
+                        ));
+            }
+        } else {
+            trap(&format!(
+                    "caller {} could not be authenticated against device pubkey {} and no temporary key was sent",
+                    caller(),
+                    device_principal,
+                    ));
+        }
     }
 
     let allocation = state::storage_mut(|storage| storage.allocate_anchor());
@@ -181,9 +201,19 @@ pub fn register(device_data: DeviceData, challenge_result: ChallengeAttempt) -> 
                 ))
             });
             write_anchor(anchor_number, anchor);
+
+            // Save the 'temp_key' as a mean of authenticating for a short period of time, see
+            // `TempKeys`
+            let expiration = time().saturating_add(delegation::DEFAULT_EXPIRATION_PERIOD_NS);
+            if let Some(temp_key) = temp_key {
+                state::with_temp_keys_mut(|temp_keys| {
+                    temp_keys.insert(device.pubkey.clone(), (temp_key, expiration));
+                });
+            }
             archive_operation(
                 anchor_number,
-                caller(),
+                device_principal, // pretend it's the device itself. TODO: Should we keep track of whether
+                                  // this was a temp key?
                 Operation::RegisterAnchor {
                     device: DeviceDataWithoutAlias::from(device),
                 },

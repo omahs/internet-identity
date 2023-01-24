@@ -74,9 +74,27 @@ pub struct PersistentState {
     pub canister_creation_cycles_cost: u64,
 }
 
+
+// A map of "temporary keys" attached to devices. A temporary key can be used in lieu
+// of the device but has a short expiration time. These keys are used as a workaround for WebAuthn
+// needing two users interactions: one for "create" and one for "sign". So instead we only "create"
+// and instead authenticate the user with a temporary key for their first visit.
+//
+// Note: we link the temporary keys to a device (as opposed to an anchor) so that we can make sure
+// the temporary key is dropped if the device itself is removed. This ensures the temporary key is
+// no more powerful than the device, i.e. if the user decides to remove the device right after
+// registration, then the the temporary key cannot be used to authenticate (similary to how the
+// browser session key pair cannot be used to authenticate if the actual delegated WebAuthn device is
+// removed)
+//
+// The 'Timestamp' value represents the expiration date (nanos since the epoch)
+pub type TempKeys = HashMap<DeviceKey, (Principal, Timestamp)>;
+
 struct State {
     storage: RefCell<Storage<DefaultMemoryImpl>>,
     sigs: RefCell<SignatureMap>,
+    // Temporary keys that can be used in lieu of a particular device
+    temp_keys: RefCell<TempKeys>,
     asset_hashes: RefCell<AssetHashes>,
     last_upgrade_timestamp: Cell<Timestamp>,
     // note: we COULD persist this through upgrades, although this is currently NOT persisted
@@ -108,6 +126,7 @@ impl Default for State {
                 DefaultMemoryImpl::default(),
             )),
             sigs: RefCell::new(SignatureMap::default()),
+            temp_keys: RefCell::new(HashMap::new()),
             asset_hashes: RefCell::new(AssetHashes::default()),
             last_upgrade_timestamp: Cell::new(0),
             inflight_challenges: RefCell::new(HashMap::new()),
@@ -259,6 +278,10 @@ pub fn signature_map<R>(f: impl FnOnce(&SignatureMap) -> R) -> R {
 
 pub fn signature_map_mut<R>(f: impl FnOnce(&mut SignatureMap) -> R) -> R {
     STATE.with(|s| f(&mut s.sigs.borrow_mut()))
+}
+
+pub fn with_temp_keys_mut<R>(f: impl FnOnce(&mut TempKeys) -> R) -> R {
+    STATE.with(|s| f(&mut s.temp_keys.borrow_mut()))
 }
 
 pub fn storage<R>(f: impl FnOnce(&Storage<DefaultMemoryImpl>) -> R) -> R {
