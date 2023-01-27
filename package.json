@@ -5,7 +5,7 @@
   "description": "",
   "keywords": [],
   "scripts": {
-    "opts": "NODE_OPTIONS='--loader ts-node/esm --experimental-specifier-resolution=node' \"$@\"",
+    "opts": "NODE_OPTIONS='--openssl-legacy-provider --loader ts-node/esm --experimental-specifier-resolution=node' \"$@\"",
     "start": "II_FETCH_ROOT_KEY=1 npm run opts -- webpack serve --config-name app",
     "generate": "npm run generate:types && npm run generate:js",
     "generate:types": "didc bind ./src/internet_identity/internet_identity.did -t ts > src/frontend/generated/internet_identity_types.d.ts",
