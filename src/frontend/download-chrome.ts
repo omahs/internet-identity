@@ -32,12 +32,14 @@ export async function downloadChrome() {
   const moduleExecutablePath = getExecutablePath(config, installPath);
   try {
     await stat(moduleExecutablePath);
+    console.log("Chromium exists: " + moduleExecutablePath);
     return moduleExecutablePath;
   } catch (_) {
     /* noop */
   }
 
   // If not, create the cache and download
+  console.log("Creating chromium cache and downloading chromium");
 
   try {
     mkdirSync(installPath);
@@ -47,12 +49,14 @@ export async function downloadChrome() {
   const folderPath = getFolderPath(config, installPath);
   const zipPath = `${folderPath}.zip`;
 
+  console.log("Downloading chromiumm...");
   await downloadToFile({ url: downloadURL(config), outfile: zipPath });
 
   // Now extract the zip and install it to the cache
   await extract(zipPath, { dir: folderPath });
   await unlink(zipPath);
 
+  console.log("Will use chromium: " + moduleExecutablePath);
   return moduleExecutablePath;
 }
 
