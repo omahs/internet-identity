@@ -5,7 +5,7 @@
   "description": "",
   "keywords": [],
   "scripts": {
-    "opts": "NODE_OPTIONS='--openssl-legacy-provider --loader ts-node/esm --experimental-specifier-resolution=node' \"$@\"",
+    "opts": "NODE_OPTIONS='--loader ts-node/esm --experimental-specifier-resolution=node' \"$@\"",
     "start": "II_FETCH_ROOT_KEY=1 npm run opts -- webpack serve --config-name app",
     "generate": "npm run generate:types && npm run generate:js",
     "generate:types": "didc bind ./src/internet_identity/internet_identity.did -t ts > src/frontend/generated/internet_identity_types.d.ts",
@@ -58,7 +58,7 @@
     "url-loader": "^4.1.1",
     "util": "0.12.4",
     "webdriverio": "7.25.1",
-    "webpack": "5.45.1",
+    "webpack": "5.75.0",
     "webpack-cli": "~5",
     "webpack-dev-server": "~4"
   },
