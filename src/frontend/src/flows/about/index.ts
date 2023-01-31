@@ -4,7 +4,7 @@ import { compatibilityData } from "../../components/compatibilityChart";
 import { mainWindow } from "../../components/mainWindow";
 import { LocalStorageI18n, I18n } from "../../utils/i18n";
 
-import copyJson  from './copy.json' assert { type: "json" };
+import copyJson from "./copy.json" assert { type: "json" };
 
 const aboutContentSlot = (i18n: I18n) => {
   const copy = i18n.i18n(copyJson);
@@ -22,54 +22,40 @@ const aboutContentSlot = (i18n: I18n) => {
       <p class="t-paragraph">${copy.your_ii_is}</p>
     </div>
     <div class="l-stack">
-      <h2 class="t-title">Easy and Secure Login</h2>
-      <p class="t-paragraph">
-        Get the privacy of many separate accounts, with the convenience of a
-        single sign-on. Internet Identity generates a new private key for every
-        dapp that you use, and stores the keys on your device. With just your
-        Identity Anchor and device, you can manage hundreds of private keys and
-        accounts.
-      </p>
+      <h2 class="t-title">${copy.easy_secure_login}</h2>
+      <p class="t-paragraph">${copy.privacy_and_convenience}</p>
     </div>
     <div class="l-stack">
-      <h2 class="t-title">Explore dapps on the Internet Computer</h2>
-      <p class="t-paragraph">
-        With an Identity Anchor, you can create accounts with dapps on the
-        Internet Computer, like:
-      </p>
+      <h2 class="t-title">${copy.explore_dapps}</h2>
+      <p class="t-paragraph">${copy.ic_dapps}</p>
       <ul class="c-list c-list--bulleted l-stack">
         <li class="c-list__item">
           <a
-            href="https://distrikt.app/"
+            href=${copy.distrikt_link}
             target="_blank"
             rel="noopener noreferrer"
-            >Distrikt</a
+            >${copy.distrikt_name}</a
           >
-          <p>
-            A decentralized, professional social media network that empowers
-            users to own and control their identity and data.
-          </p>
+          <p>${copy.distrikt_desc}</p>
         </li>
         <li class="c-list__item">
           <a
-            href="https://dscvr.ic0.app/"
+            href=${copy.discover_link}
             target="_blank"
             rel="noopener noreferrer"
-            >Discovr</a
+            >${copy.discover_name}</a
           >
-          <p>
-            A decentralized social media platform that rewards users for their
-            contributions.
-          </p>
+          <p>${copy.discover_desc}</p>
         </li>
         <li class="c-list__item">
-          <a href="https://oc.app/" target="_blank" rel="noopener noreferrer">
-            OpenChat
+          <a
+            href=${copy.openchat_link}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            ${copy.openchat_name}
           </a>
-          <p>
-            OpenChat is a fully featured chat application running end-to-end on
-            the Internet Computer blockchain.
-          </p>
+          <p>${copy.openchat_desc}</p>
         </li>
       </ul>
     </div>
@@ -110,8 +96,9 @@ export const pageContent = (i18n: I18n) =>
 export const aboutView = (): void => {
   document.title = "About | Internet Identity";
   const container = document.getElementById("pageContent") as HTMLElement;
+  // TODO: check hydration
   if (process.env.HYDRATE_STATIC_PAGES !== "0") {
-    hydrate(pageContent, container);
+    hydrate(pageContent(i18n), container);
   }
 
   const i18n = new LocalStorageI18n();
