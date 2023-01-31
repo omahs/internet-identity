@@ -2,8 +2,6 @@ import { TemplateResult, html } from "lit-html";
 import { asyncReplace } from "lit-html/directives/async-replace.js";
 import { Chan } from "./utils";
 
-// TODO: custom type errors when missing in language?
-
 type Language = typeof languages[number];
 
 const languages = ["en"] as const;
@@ -19,7 +17,6 @@ export interface I18n {
 }
 
 export class LocalStorageI18n implements I18n {
-  // TODO: support deregistering
   private chan: Chan<Language> = new Chan(LocalStorageI18n.inferUserLanguage());
 
   static inferUserLanguage(): Language {

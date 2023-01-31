@@ -156,7 +156,6 @@ export function wrapError(err: unknown): string {
  * Values can be sent (`send()`) and received (`recv()`) asynchronously
  * on the other end.
  */
-// TODO: check to make sure listeners are not leaked
 export class Chan<A> {
   /* The `recv` function will read values both from a blocking `snd` function
    * and from a buffer. We always _first_ write to `snd` and _then_ write
