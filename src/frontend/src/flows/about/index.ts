@@ -12,9 +12,7 @@ const aboutContentSlot = (i18n: I18n) => {
   return html`
     <h1 class="t-title t-title--main">About</h1>
     <div class="l-stack">
-      <h2 class="t-title">
-        Securely connect to dapps on the Internet Computer
-      </h2>
+      <h2 class="t-title">${copy.securely_connect}</h2>
       <p class="t-lead">${copy.use_ii}</p>
     </div>
     <div class="l-stack">
