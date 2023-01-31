@@ -51,7 +51,6 @@ export class LocalStorageI18n implements I18n {
 }
 
 export class DummyI18n implements I18n {
-  // TODO: support deregistering
   private chan: Chan<Language> = new Chan("en");
 
   i18n<Keys extends string>(copy: StringCopy<Keys>): DynamicCopy<Keys> {
