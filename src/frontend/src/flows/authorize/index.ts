@@ -26,18 +26,18 @@ export const authnTemplateAuthorize = ({
   derivationOrigin?: string;
   i18n: I18n;
 }): AuthnTemplates => {
+  const copy = i18n.i18n(copyJson);
   const chasm =
     derivationOrigin !== undefined
       ? mkChasm({
           info: "shared identity",
-          message: html`<span class="t-strong">${origin}</span> is an
-            alternative domain of <br /><span class="t-strong"
+          message: html`<span class="t-strong">${origin}</span> ${copy.is_alternative_of} <br /><span class="t-strong"
               >${derivationOrigin}</span
-            ><br />and you will be authenticated to both with the same identity.`,
+            ><br />${copy.auth_same_identity}`,
         })
       : undefined;
 
-  const wrap = (title: string) => html`
+  const wrap = (title: string | TemplateResult) => html`
     <div class="t-centered">
       <h1 class="t-title t-title--main">${title}</h1>
       <p class="t-lead">
@@ -51,9 +51,9 @@ export const authnTemplateAuthorize = ({
   `;
   return {
     firstTime: {
-      slot: wrap("Create an Anchor"),
-      useExistingText: "Use Existing",
-      createAnchorText: "Create an Anchor",
+      slot: wrap(copy.first_time_create),
+      useExistingText: copy.first_time_use,
+      createAnchorText: copy.first_time_create_text,
     },
     useExisting: {
       slot: wrap("Enter an Anchor"),

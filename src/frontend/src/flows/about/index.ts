@@ -97,10 +97,10 @@ export const aboutView = (): void => {
   document.title = "About | Internet Identity";
   const container = document.getElementById("pageContent") as HTMLElement;
   // TODO: check hydration
+  const i18n = new LocalStorageI18n();
   if (process.env.HYDRATE_STATIC_PAGES !== "0") {
     hydrate(pageContent(i18n), container);
   }
 
-  const i18n = new LocalStorageI18n();
   render(pageContent(i18n), container);
 };
