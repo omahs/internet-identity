@@ -1,36 +1,34 @@
+/** A showcase for static pages. II pages are given a fake connection and loaded from here
+ * just to give an idea of what they look like, and to speed up the development cycle when
+ * working on HTML and CSS. */
+
 import { TemplateResult, html } from "lit-html";
 import { asyncReplace } from "lit-html/directives/async-replace.js";
 import { Chan } from "./utils";
 
-type Language = typeof languages[number];
 
-const languages = ["en"] as const;
-
-type StringCopy<Keys extends string> = {
-  [key in Language]: { [key in Keys]: string };
+// The type of raw copy
+type StringCopy<Keys extends string, Lang extends string> = {
+  [key in Lang]: { [key in Keys]: string };
 };
+
+// The type of dynamic copy
 type DynamicCopy<Keys extends string> = { [key in Keys]: TemplateResult };
 
-export interface I18n {
-  setLanguage: (lang: Language) => void;
-  i18n: <Keys extends string>(copy: StringCopy<Keys>) => DynamicCopy<Keys>;
-}
+/// Foo, bar, baz
+export class I18n<Lang extends string> {
+  private chan: Chan<Lang>;
+  private lang: Lang;
 
-export class LocalStorageI18n implements I18n {
-  private chan: Chan<Language> = new Chan(LocalStorageI18n.inferUserLanguage());
-
-  static inferUserLanguage(): Language {
-    const lsLang = window.localStorage.getItem("lang") as Language;
-    if (lsLang !== null && languages.includes(lsLang)) {
-      return lsLang as Language; // TODO check this
-    }
-    return "en";
+  constructor(def: Lang) {
+    this.chan = new Chan(def);
+    this.lang = def;
   }
 
-  i18n<Keys extends string>(copy: StringCopy<Keys>): DynamicCopy<Keys> {
-    type EnglishCopy = StringCopy<Keys>["en"];
-    const englishCopy: EnglishCopy = copy.en;
-    const keys: [Keys] = Object.keys(englishCopy) as [Keys];
+  i18n<Keys extends string>(copy: StringCopy<Keys, Lang>): DynamicCopy<Keys> {
+    type DefaultCopy = StringCopy<Keys, Lang>[Lang];
+    const defCopy: DefaultCopy = copy[this.lang];
+    const keys: [Keys] = Object.keys(defCopy) as [Keys];
 
     const internationalized = keys.reduce((acc, k) => {
       const value: AsyncIterable<string> = this.chan.map((lang) => {
@@ -44,34 +42,12 @@ export class LocalStorageI18n implements I18n {
     return internationalized;
   }
 
-  setLanguage(lang: Language) {
+  setLanguage(lang: Lang) {
     this.chan.send(lang);
-    window.localStorage.setItem("lang", lang);
-  }
-}
-
-export class DummyI18n implements I18n {
-  private chan: Chan<Language> = new Chan("en");
-
-  i18n<Keys extends string>(copy: StringCopy<Keys>): DynamicCopy<Keys> {
-    type EnglishCopy = StringCopy<Keys>["en"];
-    const englishCopy: EnglishCopy = copy.en;
-    const keys: [Keys] = Object.keys(englishCopy) as [Keys];
-
-    const internationalized = keys.reduce((acc, k) => {
-      const value: AsyncIterable<string> = this.chan.map((lang) => {
-        return copy[lang][k];
-      });
-
-      acc[k] = html`${asyncReplace(value)}`;
-      return acc;
-    }, {} as DynamicCopy<Keys>);
-
-    return internationalized;
+    this.lang = lang;
   }
 
-  setLanguage(lang: Language) {
-    console.log("Set language:", lang);
-    this.chan.send(lang);
+  getLanguageAsync(): AsyncIterable<Lang> {
+    return this.chan.map((x) => x);
   }
 }

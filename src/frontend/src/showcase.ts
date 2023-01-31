@@ -5,7 +5,7 @@ import "./styles/main.css";
 import { createRef, ref, Ref } from "lit-html/directives/ref.js";
 import { asyncReplace } from "lit-html/directives/async-replace.js";
 import { Chan, NonEmptyArray, asNonEmptyArray } from "./utils/utils";
-import { DummyI18n } from "./utils/i18n";
+import { I18n } from "./utils/i18n";
 import { withRef, mount } from "./utils/lit-html";
 import { TemplateResult, html, render } from "lit-html";
 import {
@@ -52,7 +52,7 @@ import { registerDisabled } from "./flows/registerDisabled";
 const dummyConnection = undefined as unknown as AuthenticatedConnection;
 const userNumber = BigInt(10000);
 
-const i18n = new DummyI18n();
+const i18n = new I18n("en");
 
 const recoveryPhrase: DeviceData = {
   alias: "Recovery Phrase",
@@ -356,6 +356,54 @@ const components = (): TemplateResult => {
                 </div>
 
     `;
+};
+
+const i18nExample = () => {
+  type Lang = "en" | "fr";
+  const exampleI18n = new I18n<Lang>("en");
+
+  const copy = exampleI18n.i18n({
+    en: {
+      title: "i18n support",
+      paragraph:
+        "This is an example of internationalization support in Internet Identity. Click a button to change the language.",
+    },
+    fr: {
+      title: "support i18n",
+
+      paragraph:
+        "Ceci est un exemple de support multi-language dans Internet Identity. Cliquez un des boutons ci-dessous pour changer la langue.",
+    },
+  });
+
+  const langIs = (lang: Lang) =>
+    asyncReplace(exampleI18n.getLanguageAsync(), (x) => x == lang);
+  const langButton = (lang: Lang) => html`
+    <button
+      ?disabled=${langIs(lang)}
+      class="c-button"
+      @click=${() => exampleI18n.setLanguage(lang)}
+    >
+      ${lang}
+    </button>
+  `;
+
+  return html`
+    <style>
+      .i18n-example {
+        max-width: 60rem;
+      }
+    </style>
+    <section class="i18n-example">
+      <article class="l-statck c-card c-card--highlight">
+        <h2 class="t-title t-tile--main">${copy.title}</h2>
+        <p class="t-lead">${copy.paragraph}</p>
+        <div class="c-button-group">
+          ${langButton("en")} ${langButton("fr")}
+        </div>
+      </article>
+    </section>
+  `;
 };
 
 // The showcase

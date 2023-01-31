@@ -11,11 +11,11 @@ import { fileURLToPath } from "url";
 import { TemplateResult } from "lit-html";
 import { render } from "@lit-labs/ssr/lib/render-lit-html";
 import { pageContent as aboutStaticContent } from "./src/frontend/src/flows/about";
-import { DummyI18n } from "./src/frontend/src/utils/i18n";
+import { I18n } from "./src/frontend/src/i18n";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 
-const i18n = new DummyI18n();
+const i18n = new I18n();
 
 /** Read the II canister ID from dfx's local state */
 function readCanisterId() {

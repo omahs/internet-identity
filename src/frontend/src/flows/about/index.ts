@@ -2,7 +2,7 @@ import { html, render } from "lit-html";
 import { hydrate } from "lit-html/experimental-hydrate.js";
 import { compatibilityData } from "../../components/compatibilityChart";
 import { mainWindow } from "../../components/mainWindow";
-import { LocalStorageI18n, I18n } from "../../utils/i18n";
+import { I18n } from "../../i18n";
 
 import copyJson from "./copy.json" assert { type: "json" };
 
@@ -12,7 +12,7 @@ const aboutContentSlot = (i18n: I18n) => {
   return html`
     <h1 class="t-title t-title--main">About</h1>
     <div class="l-stack">
-      <h2 class="t-title">${copy.securely_connect}</h2>
+      <h2 class="t-title">${copy.header}</h2>
       <p class="t-lead">${copy.use_ii}</p>
     </div>
     <div class="l-stack">
@@ -94,8 +94,7 @@ export const pageContent = (i18n: I18n) =>
 export const aboutView = (): void => {
   document.title = "About | Internet Identity";
   const container = document.getElementById("pageContent") as HTMLElement;
-  // TODO: check hydration
-  const i18n = new LocalStorageI18n();
+  const i18n = new I18n();
   if (process.env.HYDRATE_STATIC_PAGES !== "0") {
     hydrate(pageContent(i18n), container);
   }

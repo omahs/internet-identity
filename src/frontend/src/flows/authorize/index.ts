@@ -8,7 +8,7 @@ import { displayError } from "../../components/displayError";
 import { spinner } from "../../components/icons";
 import { recoveryWizard } from "../recovery/recoveryWizard";
 import { authenticationProtocol } from "./postMessageInterface";
-import { I18n, LocalStorageI18n } from "../../utils/i18n";
+import { I18n } from "../../i18n";
 import {
   authenticateBox,
   AuthnTemplates,
@@ -71,7 +71,7 @@ export const authnTemplateAuthorize = ({
 export const authFlowAuthorize = async (
   connection: Connection
 ): Promise<void> => {
-  const i18n = new LocalStorageI18n();
+  const i18n = new I18n();
   const container = document.getElementById("pageContent") as HTMLElement;
   const copy = i18n.i18n(copyJson);
   render(html`<h1>${copy.starting_authentication}</h1>`, container);

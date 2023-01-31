@@ -183,9 +183,7 @@ export class Chan<A> {
 
   // Constructor with latest which is "initial" and then latest
   constructor(initial?: A) {
-    console.log("setting", initial);
     this.latest = initial;
-    console.log("set:", this.latest);
   }
 
   send(a: A): void {
@@ -219,11 +217,7 @@ export class Chan<A> {
   // consumes the values: if you need to read the value from different
   // places use `.map()` instead.
   async *recv(): AsyncIterable<A> {
-    // TODO: throw error if recv was called already?
-
-    console.log("recv", this.latest);
     if (this.latest !== undefined) {
-      console.log("Sending latest:", this.latest);
       yield this.latest;
     }
 
