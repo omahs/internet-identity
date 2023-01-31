@@ -31,7 +31,8 @@ export const authnTemplateAuthorize = ({
     derivationOrigin !== undefined
       ? mkChasm({
           info: "shared identity",
-          message: html`<span class="t-strong">${origin}</span> ${copy.is_alternative_of} <br /><span class="t-strong"
+          message: html`<span class="t-strong">${origin}</span>
+            ${copy.is_alternative_of} <br /><span class="t-strong"
               >${derivationOrigin}</span
             ><br />${copy.auth_same_identity}`,
         })
