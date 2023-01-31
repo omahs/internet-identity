@@ -4,7 +4,7 @@ import { compatibilityData } from "../../components/compatibilityChart";
 import { mainWindow } from "../../components/mainWindow";
 import { LocalStorageI18n, I18n } from "../../utils/i18n";
 
-import copyJson from "./copy.json";
+import copyJson  from './copy.json' assert { type: "json" };
 
 const aboutContentSlot = (i18n: I18n) => {
   const copy = i18n.i18n(copyJson);
